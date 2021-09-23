@@ -7,13 +7,13 @@ from tweepy import Stream
 
 class TwitterListener(StreamListener):
 
-    def __init__(self, file_name: str, track_list: list[str]):
-        assert file_name is not None and track_list is not None
-        assert len(file_name) > 0 and len(track_list) > 0
+    def __init__(self, file: str , track_list: list):
+        assert file is not None and track_list is not None
+        assert len(file) > 0 and len(track_list) > 0
         self.cont_tweet = 0
         self.max_tweets = 100000000000000000000
         self.track_list = track_list
-        self.file_name = file_name + "" if ".csv" in file_name else ".csv"
+        self.file_name = file + "" if ".csv" in file else ".csv"
 
     def on_data(self, data):
         # incrementa o contador de tweets
@@ -27,12 +27,14 @@ class TwitterListener(StreamListener):
             body_content: str = tweet.get('extended_tweet')['full_text'] \
                 if 'extended_tweet' in tweet else tweet.get('text')
 
+
             for key_str in self.track_list:
                 if key_str in body_content:
                     as_key_str = True
                     break
 
-            if "RT " not in tweet.get('text') and as_key_str:
+            if "RT " not in tweet.get('text') and as_key_str \
+                and "pt" in tweet.get('lang'):
                 
                 print(tweet)
 
@@ -68,9 +70,9 @@ def main():
     consumer_secret = ""
 
     # Track list para filtrar os assuntos
-    track_list: list[str] = []
+    track_list: list[str] = ["adultoney","neymar", "Neymar"]
     # Nome do arquivo onde será salvo
-    file_name: str = ""
+    file_name: str = "ney_base.csv"
 
     tl = TwitterListener(file_name, track_list)
     oauth = OAuthHandler(consumer_key, consumer_secret)
